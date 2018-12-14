@@ -13,6 +13,44 @@ namespace SignalRServer
         private static readonly List<Player> clients = new List<Player>();
         private static readonly List<Pexeso> Games = new List<Pexeso>();
 
+
+
+        public override Task OnDisconnected(bool stopCalled)
+        {
+            Console.WriteLine("DISCONNECTED");
+            //var game = games.FirstOrDefault(x => x.Player1.ConnectionId == Context.ConnectionId || x.Player2.ConnectionId == Context.ConnectionId);
+            //if (game == null)
+            //{
+            //    // Client without game?
+            //    var clientWithoutGame = clients.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
+            //    if (clientWithoutGame != null)
+            //    {
+            //        clients.Remove(clientWithoutGame);
+
+            //        SendStatsUpdate();
+            //    }
+            //    return null;
+            //}
+
+            //if (game != null)
+            //{
+            //    games.Remove(game);
+            //}
+
+            //var client = game.Player1.ConnectionId == Context.ConnectionId ? game.Player1 : game.Player2;
+
+            var client = Context.ConnectionId;
+            //if (client == null) return null;
+
+            clients.RemoveAll(p => p.ConnectionId == Context.ConnectionId);
+            //if (client.Opponent != null)
+            //{
+            //    SendStatsUpdate();
+            //    return Clients.Client(client.Opponent.ConnectionId).opponentDisconnected(client.Name);
+            //}
+            return this.RefreshPlayers();
+        }
+
         public override Task OnConnected()
         {
             Console.WriteLine("connected");
@@ -42,8 +80,13 @@ namespace SignalRServer
                 Player.IsPlaying = false;
             }
 
-            SendStatsUpdate();
+            //SendStatsUpdate();
             Clients.Client(Context.ConnectionId).registerComplete();
+        }
+
+        public Task RefreshPlayers()
+        {
+            return Clients.All.listOfPlayers(clients); ;
         }
 
 

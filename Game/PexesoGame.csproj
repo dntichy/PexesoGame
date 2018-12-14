@@ -69,11 +69,11 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Entities\ChatMessage.cs" />
+    <Compile Include="Entities\Player.cs" />
     <Compile Include="Enums\MessageType.cs" />
     <Compile Include="Pages\ChoosePlayerPage.xaml.cs">
       <DependentUpon>ChoosePlayerPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Entities\Player.cs" />
     <Compile Include="Pages\GamePage.xaml.cs">
       <DependentUpon>GamePage.xaml</DependentUpon>
     </Compile>

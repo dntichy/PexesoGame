@@ -7,7 +7,8 @@
         xmlns:local="clr-namespace:PexGame"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
-        Loaded="Window_Loaded">
+        Loaded="Window_Loaded"
+        Closed="Window_OnClosed">
 
 
     <Frame        

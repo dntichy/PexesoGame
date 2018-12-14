@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Game.Entities;
 using PexGame;
 
 namespace Game
@@ -24,16 +26,23 @@ namespace Game
         public RegisterPlayerPage()
         {
             InitializeComponent();
+            DataContext = this;
+        }
+
+        public void OnPageLoaded(object sender, RoutedEventArgs e)
+        {
+            MainWindow.Main.RegisterPage = this;
+
         }
 
         private void OnRegisterUserClicked(object sender, RoutedEventArgs e)
         {
-            var x = NickNameTextBox.Text;
 
-
-            NavigationService.Navigate(new ChoosePlayerPage());
+            ChoosePlayerPage cp = new ChoosePlayerPage();
+            MainWindow.Main.RegClient(NickNameTextBox.Text);
+            NavigationService.Navigate(cp);
             //MainWindow.Main.ConnectAsync(NickNameTextBox.Text);
-            Console.WriteLine(MainWindow.Main.TestProp);
+            //Console.WriteLine(MainWindow.Main.TestProp);
 
         }
 
