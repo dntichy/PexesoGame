@@ -1,0 +1,36 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="container">
+
+    <div class="row"><h1>Pexeso game</h1></div>
+    <div class="row">
+        <div class="col-6">&nbsp;</div>
+        <div class="col-6">
+            NickName<input type="text" id="userInput"/>
+            <br/>
+            Message...<input type="text" id="messageInput"/>
+            <input type="button" id="sendButton" value="Send Message"/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <hr/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">&nbsp;</div>
+        <div class="col-6">
+            <ul id="messagesList"></ul>
+        </div>
+    </div>
+</div>
+
+
+<script src="Scripts/jquery-3.3.1.min.js"></script>
+<script src="Scripts/jquery.signalR-2.4.0.min.js"></script>
+<script src="http://localhost:8084/signalr/hubs"></script>
+<script src="~/js/Game.js"></script>
