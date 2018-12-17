@@ -1,4 +1,10 @@
-﻿namespace SignalRServer
+﻿using System;
+using System.IO;
+using System.Reflection;
+using System.Web;
+using SignalRServer.Enums;
+
+namespace SignalRServer
 {
     public class Pexeso
     {
@@ -10,86 +16,75 @@
 
         public Player Player2 { get; set; }
 
-        private readonly int[] field = new int[9];
-        private int movesLeft = 9;
+        public GameTypes GameType { get; set; }
+
+        public DateTime GameStart { get; set; }
+
+        public Picture[,] GameField;
 
         public Pexeso()
         {
-            // Reset game
-            for (var i = 0; i < field.Length; i++)
+            Console.WriteLine("NEW PEx");
+
+            switch (GameType)
             {
-                field[i] = -1;
+                case GameTypes.OsemXOsem:
+                    GameField = new Picture[8, 8];
+                    break;
+
+                case GameTypes.SedemXSest:
+                    GameField = new Picture[7, 6];
+                    break;
+
+                case GameTypes.OsemXSedem:
+                    GameField = new Picture[8, 7];
+                    break;
+                case GameTypes.PatXStyri:
+                    GameField = new Picture[5, 4];
+                    break;
+
+                case GameTypes.SestXPat:
+                    GameField = new Picture[6, 5];
+                    break;
+
+                case GameTypes.SestXSest:
+                    GameField = new Picture[6, 6];
+                    break;
+
+                case GameTypes.StyriXStyri:
+                    GameField = new Picture[4, 4];
+                    break;
+
+                case GameTypes.StyriXTri:
+                    GameField = new Picture[4, 3];
+                    break;
+
+                case GameTypes.TriXDva:
+                    GameField = new Picture[3, 2];
+                    break;
             }
+
+            FillWithPictures(GameField);
         }
 
-        /// <summary>
-        /// Insert a marker at a given position for a given player
-        /// </summary>
-        /// <param name="player">The player number should be 0 or 1</param>
-        /// <param name="position">The position where to place the marker, should be between 0 and 9</param>
-        /// <returns>True if a winner was found</returns>
-        public bool Play(int player, int position)
+        private void FillWithPictures(Picture[,] gameField)
         {
-            if (IsGameOver)
-                return false;
 
-            PlaceMarker(player, position);
 
-            return CheckWinner();
-        }
+            string path = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
+                @"Pictures\0.jpg");
 
-        /// <summary>
-        /// Checks each different combination of marker placements and looks for a winner
-        /// Each position is marked with an initial -1 which means no marker has yet been placed
-        /// </summary>
-        /// <returns>True if there is a winner</returns>
-        private bool CheckWinner()
-        {
-            for (int i = 0; i < 3; i++)
+            var imageData = File.ReadAllBytes(path);
+
+            gameField[0, 0] = new Picture()
             {
-                if (
-                    ((field[i * 3] != -1 && field[(i * 3)] == field[(i * 3) + 1] && field[(i * 3)] == field[(i * 3) + 2]) ||
-                     (field[i] != -1 && field[i] == field[i + 3] && field[i] == field[i + 6])))
-                {
-                    IsGameOver = true;
-                    return true;
-                }
-            }
-
-            if ((field[0] != -1 && field[0] == field[4] && field[0] == field[8]) || (field[2] != -1 && field[2] == field[4] && field[2] == field[6]))
-            {
-                IsGameOver = true;
-                return true;
-            }
-
-            return false;
+                Image = imageData
+            };
         }
+    }
 
-        /// <summary>
-        /// Places a marker at the given position for the given player as long as the position is marked as -1
-        /// </summary>
-        /// <param name="player">The player number should be 0 or 1</param>
-        /// <param name="position">The position where to place the marker, should be between 0 and 9</param>
-        /// <returns>True if the marker position was not already taken</returns>
-        private bool PlaceMarker(int player, int position)
-        {
-            movesLeft -= 1;
-
-            if (movesLeft <= 0)
-            {
-                IsGameOver = true;
-                IsDraw = true;
-                return false;
-            }
-
-            if (position > field.Length)
-                return false;
-            if (field[position] != -1)
-                return false;
-
-            field[position] = player;
-
-            return true;
-        }
+    public class Picture
+    {
+        public byte[] Image;
     }
 }

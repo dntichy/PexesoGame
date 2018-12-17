@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PexesoGame", "Game\PexesoGa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRServer", "SignalRServer\SignalRServer.csproj", "{FBBB91BC-C02E-4CF8-A978-C40CCEA41665}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebGame", "WebGame\WebGame.csproj", "{9C5E6BC7-F953-4808-A55A-A934C515D84D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebGame", "WebGame\WebGame.csproj", "{9C5E6BC7-F953-4808-A55A-A934C515D84D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

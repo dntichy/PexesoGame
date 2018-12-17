@@ -70,7 +70,7 @@
     </ApplicationDefinition>
     <Compile Include="Entities\ChatMessage.cs" />
     <Compile Include="Entities\Player.cs" />
-    <Compile Include="Enums\MessageType.cs" />
+    <Compile Include="Enums\GameTypes.cs" />
     <Compile Include="Pages\ChoosePlayerPage.xaml.cs">
       <DependentUpon>ChoosePlayerPage.xaml</DependentUpon>
     </Compile>

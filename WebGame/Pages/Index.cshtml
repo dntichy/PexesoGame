@@ -1,36 +1,96 @@
 ﻿@page
+
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
 }
 
-<div class="container">
 
-    <div class="row"><h1>Pexeso game</h1></div>
-    <div class="row">
-        <div class="col-6">&nbsp;</div>
-        <div class="col-6">
-            NickName<input type="text" id="userInput"/>
-            <br/>
-            Message...<input type="text" id="messageInput"/>
-            <input type="button" id="sendButton" value="Send Message"/>
+<div id="messageBox">
+
+</div>
+<div class="container">
+    <div id="registrationContainer">
+        <div class="row">
+            <h1>Pexeso game</h1>
+            <h4>Zadajte vašu prezývku</h4>
+        </div>
+        <div class="row">
+            <div class="col-6">&nbsp;</div>
+            <div class="col-6">
+                Nick: <input type="text" id="userInput"/>
+
+                <input required type="button" id="sendButton" value="OK"/>
+            </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-12">
-            <hr/>
+
+
+    <div id="choosePlayerContainer" style="display: none">
+
+        <div class="row">
+            <h1>Pexeso game</h1>
+        </div>
+        <div class="row">
+            <h4>Zvoľte typ hry:</h4>
+            <form action="">
+                <input type="radio" name="gameType" value="3x2"> 3x2<br>
+                <input type="radio" name="gameType" value="4x3"> 4x3<br>
+                <input type="radio" name="gameType" value="4x4"> 4x4<br>
+                <input type="radio" name="gameType" value="5x4"> 5x4<br>
+                <input type="radio" name="gameType" value="6x5"> 6x5<br>
+                <input type="radio" name="gameType" value="6x6"> 6x6<br>
+                <input type="radio" name="gameType" value="7x6"> 7x6<br>
+                <input type="radio" name="gameType" value="8x7"> 8x7<br>
+                <input type="radio" name="gameType" value="8x8"> 8x8<br>
+            </form>
+
+
+            <div class="col-6">&nbsp;</div>
+            <div class="col-6">
+                <table id="playerDataTable"></table>
+            </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-6">&nbsp;</div>
-        <div class="col-6">
-            <ul id="messagesList"></ul>
+
+
+    <div id="waitingForPlayerContainer" style="display: none">
+
+        <div class="row">
+            <h1>Pexeso game</h1>
+        </div>
+        <div class="row">
+            <div class="col-6">&nbsp;</div>
+            <div class="col-6">
+                Waiting for player <img width="200px" src="images/loading.gif"/>
+                <div id="buttonCancelInvitation"></div>
+            </div>
         </div>
     </div>
+
+    <div id="gameContainer" style="display: none">
+
+        <div class="row">
+            <h1>Pexeso game</h1>
+        </div>
+        <div class="row">
+            <div class="col-6" id="moveStatus"></div>
+            <div class="col-6" id="scoreBoard"></div>
+           
+            <div class="col-6">
+                <table id='game'></table>
+            </div>
+        </div>
+    </div>
+
+
 </div>
 
 
 <script src="Scripts/jquery-3.3.1.min.js"></script>
+<script src="Scripts/jquery-ui.min.js"></script>
 <script src="Scripts/jquery.signalR-2.4.0.min.js"></script>
 <script src="http://localhost:8084/signalr/hubs"></script>
 <script src="~/js/Game.js"></script>
+<script src="Scripts/jsboard.min.js"></script>
+<link type="text/css" href="~/css/jquery-ui.min.css" rel="stylesheet"/>

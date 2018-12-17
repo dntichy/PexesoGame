@@ -3,51 +3,35 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Hubs;
+using SignalRServer.Enums;
 
 namespace SignalRServer
 {
     public class GameHub : Hub
     {
-        private static object _syncRoot = new object();
+        private static readonly object SyncRoot = new object();
         private static int _gamesPlayed = 0;
         private static readonly List<Player> clients = new List<Player>();
         private static readonly List<Pexeso> Games = new List<Pexeso>();
 
 
-
         public override Task OnDisconnected(bool stopCalled)
         {
             Console.WriteLine("DISCONNECTED");
-            //var game = games.FirstOrDefault(x => x.Player1.ConnectionId == Context.ConnectionId || x.Player2.ConnectionId == Context.ConnectionId);
-            //if (game == null)
-            //{
-            //    // Client without game?
-            //    var clientWithoutGame = clients.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
-            //    if (clientWithoutGame != null)
-            //    {
-            //        clients.Remove(clientWithoutGame);
 
-            //        SendStatsUpdate();
-            //    }
-            //    return null;
-            //}
-
-            //if (game != null)
-            //{
-            //    games.Remove(game);
-            //}
-
-            //var client = game.Player1.ConnectionId == Context.ConnectionId ? game.Player1 : game.Player2;
-
-            var client = Context.ConnectionId;
-            //if (client == null) return null;
-
+            var Player = clients.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
             clients.RemoveAll(p => p.ConnectionId == Context.ConnectionId);
-            //if (client.Opponent != null)
-            //{
-            //    SendStatsUpdate();
-            //    return Clients.Client(client.Opponent.ConnectionId).opponentDisconnected(client.Name);
-            //}
+
+            if (Player?.Opponent != null)
+            {
+                Player.Opponent.Reinitialize();
+                Games.RemoveAll(n =>
+                    n.Player1.ConnectionId == Context.ConnectionId || n.Player2.ConnectionId == Context.ConnectionId);
+                //send that opponent has disconnected
+                return Clients.Client(Player.Opponent.ConnectionId).opponentDisconnected(Player.Name);
+            }
+
             return this.RefreshPlayers();
         }
 
@@ -57,25 +41,35 @@ namespace SignalRServer
             //return SendStatsUpdate();
             return base.OnConnected();
         }
+
         public Task SendStatsUpdate()
         {
-            
-            return Clients.All.refreshAmountOfPlayers(new {
+            return Clients.All.refreshAmountOfPlayers(new
+            {
                 totalGamesPlayed = _gamesPlayed,
                 amountOfGames = Games.Count,
-                amountOfClients = clients.Count });
+                amountOfClients = clients.Count
+            });
         }
 
         public void RegisterClient(string data)
         {
-            lock (_syncRoot)
+            lock (SyncRoot)
             {
                 var Player = clients.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
-                if (Player == null)
+
+                //user already exists
+                if (clients.Exists(n => n.Name == data))
                 {
-                    Player = new Player { ConnectionId = Context.ConnectionId, Name = data };
-                    clients.Add(Player);
+                    Clients.Client(Context.ConnectionId).registerCantCompleted();
+                    return;
                 }
+
+                //if (Player == null)
+                //{
+                Player = new Player {ConnectionId = Context.ConnectionId, Name = data};
+                clients.Add(Player);
+                //}
 
                 Player.IsPlaying = false;
             }
@@ -86,60 +80,199 @@ namespace SignalRServer
 
         public Task RefreshPlayers()
         {
-            return Clients.All.listOfPlayers(clients); ;
+            return Clients.All.listOfPlayers(clients);
+        }
+
+        public Task SearchPlayer(string name)
+        {
+            return Clients.Client(Context.ConnectionId)
+                .listOfSearchedPlayers(clients.FindAll(n => n.Name.ToLower().Contains(name.ToLower())));
         }
 
 
-        public void Play(int position)
+        public void ChallengePlayer(string name, string gameType)
         {
-            // Find the game where there is a player1 and player2 and either of them have the current connection id
-            var game = Games.FirstOrDefault(x => x.Player1.ConnectionId == Context.ConnectionId || x.Player2.ConnectionId == Context.ConnectionId);
+            //je hrac v hre? => posli fail status
 
-            if (game == null || game.IsGameOver) return;
+            //posli mu challenge, nastav obom isPlaying na true
+            //nastav openentov jeden druhemu
+            var challenger = clients.Find(c => c.ConnectionId == Context.ConnectionId);
+            var challengee = clients.Find(c => c.Name == name);
 
-            int marker = 0;
-
-            // Detect if the player connected is player 1 or player 2
-            if (game.Player2.ConnectionId == Context.ConnectionId)
+            GameTypes GameType = GameTypes.TriXDva;
+            switch (gameType)
             {
-                marker = 1;
-            }
-            var player = marker == 0 ? game.Player1 : game.Player2;
-
-            // If the player is waiting for the opponent but still tried to make a move, just return
-            if (player.WaitingForMove) return;
-
-            // Notify both players that a marker has been placed
-            Clients.Client(game.Player1.ConnectionId).addMarkerPlacement(new Program.GameInformation { OpponentName = player.Name, MarkerPosition = position });
-            Clients.Client(game.Player2.ConnectionId).addMarkerPlacement(new Program.GameInformation { OpponentName = player.Name, MarkerPosition = position });
-
-            // Place the marker and look for a winner
-            if (game.Play(marker, position))
-            {
-                Games.Remove(game);
-                _gamesPlayed += 1;
-                Clients.Client(game.Player1.ConnectionId).gameOver(player.Name);
-                Clients.Client(game.Player2.ConnectionId).gameOver(player.Name);
-            }
-
-            // If it's a draw notify the players that the game is over
-            if (game.IsGameOver && game.IsDraw)
-            {
-                Games.Remove(game);
-                _gamesPlayed += 1;
-                Clients.Client(game.Player1.ConnectionId).gameOver("It's a draw!");
-                Clients.Client(game.Player2.ConnectionId).gameOver("It's a draw!");
-            }
-
-            if (!game.IsGameOver)
-            {
-                player.WaitingForMove = !player.WaitingForMove;
-                player.Opponent.WaitingForMove = !player.Opponent.WaitingForMove;
-
-                Clients.Client(player.Opponent.ConnectionId).waitingForMarkerPlacement(player.Name);
+                case "3x2":
+                    GameType = GameTypes.TriXDva;
+                    break;
+                case "4x3":
+                    GameType = GameTypes.StyriXTri;
+                    break;
+                case "4x4":
+                    GameType = GameTypes.StyriXStyri;
+                    break;
+                case "5x4":
+                    GameType = GameTypes.PatXStyri;
+                    break;
+                case "6x5":
+                    GameType = GameTypes.SestXPat;
+                    break;
+                case "6x6":
+                    GameType = GameTypes.SedemXSest;
+                    break;
+                case "7x6":
+                    GameType = GameTypes.SedemXSest;
+                    break;
+                case "8x7":
+                    GameType = GameTypes.OsemXSedem;
+                    break;
+                case "8x8":
+                    GameType = GameTypes.OsemXOsem;
+                    break;
             }
 
-            SendStatsUpdate();
+            if (!challengee.HasInvitation)
+            {
+                Invitation newInvitation = new Invitation()
+                {
+                    FromPlayer = challenger,
+                    ToPlayer = challengee,
+                    GameType = GameType
+                };
+                challenger.HasInvitation = true;
+                challengee.HasInvitation = true;
+                challenger.Invitation = newInvitation;
+                challengee.Invitation = newInvitation;
+
+                Clients.Client(challengee.ConnectionId).gotInvitation(challenger.Name);
+            }
+            else
+            {
+                Clients.Client(Context.ConnectionId).challengePlayerFailed(name);
+            }
+
+
+            //challengee.Opponent = challenger;
+            //challengee.IsPlaying = 
+            //challenger.Opponent = challengee;
+            //return Clients.All.x();
+        }
+
+        public void RejectInvitation(string name)
+        {
+            var challengee = clients.Find(c => c.ConnectionId == Context.ConnectionId);
+            var challenger = clients.Find(c => c.Name == name);
+            challengee.HasInvitation = false;
+            challenger.HasInvitation = false;
+            challenger.Invitation = null;
+            challengee.Invitation = null;
+            ////v pripade, že jeden z nich zruší žiadosť, nastav na isPlaying false pre oboch a informuj ich o zrušení
+
+            Clients.Client(challenger.ConnectionId).challengePlayerFailed(challengee.Name);
+        }
+
+        //invitation od uzivatela name accepted
+        public void AcceptInvitation(string name)
+        {
+            var challengee = clients.Find(c => c.ConnectionId == Context.ConnectionId); //vyzyvany
+            var challenger = clients.Find(c => c.Name == name); //vyzyvatel
+
+            Pexeso newPexesoGame = new Pexeso()
+            {
+                Player1 = challenger,
+                Player2 = challengee,
+                GameType = challengee.Invitation.GameType,
+                GameStart = new DateTime()
+                
+            };
+
+            Games.Add(newPexesoGame);
+
+            challenger.Opponent = challengee;
+            challengee.Opponent = challenger;
+            challengee.GamePexeso = newPexesoGame;
+            challenger.GamePexeso = newPexesoGame;
+
+            Clients.Client(challenger.ConnectionId).challengeAccepted();
+
+            GetMultipleValue(newPexesoGame.GameType, out var a, out var b);
+            Clients.Clients(new[] {challenger.ConnectionId, challengee.ConnectionId}).createGameScenario(a, b);
+
+            challengee.Moving = true;
+            challenger.Moving = false;
+
+            Clients.Client(challengee.ConnectionId).move();
+            Clients.Client(challenger.ConnectionId).waitForMove();
+        }
+
+        public void Moved(int a, int b)
+        {
+            var game = Games.FirstOrDefault(x =>
+                x.Player1.ConnectionId == Context.ConnectionId || x.Player2.ConnectionId == Context.ConnectionId);
+            var theOneThatMoves = clients.Find(n => n.ConnectionId == Context.ConnectionId);
+            var theOpponenet = clients.Find(n => n.ConnectionId == Context.ConnectionId).Opponent;
+
+
+            theOneThatMoves.MoveCounter++;
+
+            //if 1st move
+            if (theOneThatMoves.MoveCounter < 2)
+            {
+                theOpponenet.MoveCounter++;
+                Clients.Client(Context.ConnectionId).move();
+            }
+            else
+            {
+                theOneThatMoves.MoveCounter = 0;
+                Clients.Client(Context.ConnectionId).waitForMove();
+            }
+        }
+
+
+        private void GetMultipleValue(GameTypes type, out int a, out int b)
+        {
+            a = -1;
+            b = -1;
+
+            switch (type)
+            {
+                case GameTypes.TriXDva:
+                    a = 3;
+                    b = 2;
+                    break;
+                case GameTypes.StyriXTri:
+                    a = 4;
+                    b = 3;
+                    break;
+                case GameTypes.StyriXStyri:
+                    a = 4;
+                    b = 4;
+                    break;
+                case GameTypes.PatXStyri:
+                    a = 5;
+                    b = 4;
+                    break;
+                case GameTypes.SestXPat:
+                    a = 6;
+                    b = 5;
+                    break;
+                case GameTypes.SestXSest:
+                    a = 6;
+                    b = 6;
+                    break;
+                case GameTypes.SedemXSest:
+                    a = 7;
+                    b = 6;
+                    break;
+                case GameTypes.OsemXSedem:
+                    a = 8;
+                    b = 7;
+                    break;
+                case GameTypes.OsemXOsem:
+                    a = 8;
+                    b = 8;
+                    break;
+            }
         }
     }
 }

@@ -1,22 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Game.Entities;
-using Game.Pages;
 
-namespace PexGame
+namespace Game.Pages
 {
     /// <summary>
     /// Interaction logic for ChoosePlayerPage.xaml
@@ -26,14 +11,6 @@ namespace PexGame
         public ChoosePlayerPage()
         {
             InitializeComponent();
-            
-
-
-            //Players = new ObservableCollection<Player>();
-            //Players.Add(new Player()
-            //{
-            //    Name = "jolo"
-            //});
 
             DataContext = MainWindow.Main;
             //DataContext = this;
@@ -45,6 +22,7 @@ namespace PexGame
         {
             MainWindow.Main.ChoosePlayerPage = this;
             MainWindow.Main.RequestPlayers();
+            NameLabel.Content = "Player: " + MainWindow.Main.UserName;
         }
 
         private void OnPlayGameClicked(object sender, RoutedEventArgs e)
@@ -54,12 +32,12 @@ namespace PexGame
 
         public void RereshGui()
         {
-            this.Dispatcher.Invoke(() =>
-            {
-                DataGrid.ItemsSource = MainWindow.Main.Players;
-            }); 
+            this.Dispatcher.Invoke(() => { DataGrid.ItemsSource = MainWindow.Main.Players; });
+        }
 
-
+        private void OnSearchPlayerClicked(object sender, RoutedEventArgs e)
+        {
+            MainWindow.Main.SearchPlayer(SearchNameTextBox.Text);
         }
     }
 }
