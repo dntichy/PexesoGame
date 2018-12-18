@@ -183,9 +183,8 @@ namespace SignalRServer
                 Player2 = challengee,
                 GameType = challengee.Invitation.GameType,
                 GameStart = new DateTime()
-                
             };
-
+            newPexesoGame.InitializeGameField();
             Games.Add(newPexesoGame);
 
             challenger.Opponent = challengee;
@@ -212,20 +211,99 @@ namespace SignalRServer
             var theOneThatMoves = clients.Find(n => n.ConnectionId == Context.ConnectionId);
             var theOpponenet = clients.Find(n => n.ConnectionId == Context.ConnectionId).Opponent;
 
+            if (!theOneThatMoves.Moving) return; //if was able to call this request but should be waiting
 
-            theOneThatMoves.MoveCounter++;
+            var picture = game.GameField[a, b];
 
             //if 1st move
-            if (theOneThatMoves.MoveCounter < 2)
+            if (theOneThatMoves.MoveCounter == 0)
             {
-                theOpponenet.MoveCounter++;
+                game.MoveKeeper.FirstA = a;
+                game.MoveKeeper.FirstB = b;
+                theOneThatMoves.MoveCounter++;
+                Clients.Clients(new[] {theOneThatMoves.ConnectionId, theOpponenet.ConnectionId})
+                    .showChanges(a, b, picture);
                 Clients.Client(Context.ConnectionId).move();
             }
-            else
+            else if (theOneThatMoves.MoveCounter == 1)
             {
                 theOneThatMoves.MoveCounter = 0;
-                Clients.Client(Context.ConnectionId).waitForMove();
+
+                game.MoveKeeper.SecondA = a;
+                game.MoveKeeper.SecondB = b;
+
+                var picture1 = game.GameField[game.MoveKeeper.FirstA, game.MoveKeeper.FirstB];
+                var picture2 = game.GameField[a, b];
+
+                //got points? 
+                if (picture1.Image == picture2.Image)
+                {
+                    //yes, continue
+                    //pridaj body, posli score, vymaz z hracieho poľa a urob neaktivne
+
+
+                    AddPoints(theOneThatMoves);
+
+                    Clients.Clients(new[] {theOneThatMoves.ConnectionId, theOpponenet.ConnectionId})
+                        .showChangesScored(a, b, game.MoveKeeper.FirstA, game.MoveKeeper.FirstB, picture,
+                            theOneThatMoves);
+
+                    //check if game is over now
+                    if (theOneThatMoves.Points + theOpponenet.Points == game.MaxPointsForGame / 2)
+                    {
+                        Player winner;
+                        if (theOneThatMoves.Points > theOpponenet.Points)
+                        {
+                            winner = theOneThatMoves;
+                        }
+                        else if (theOneThatMoves.Points == theOpponenet.Points)
+                        {
+                            winner = null;
+                        }
+                        else
+                        {
+                            winner = theOpponenet;
+                        }
+
+                        Clients.Clients(new[] {theOneThatMoves.ConnectionId, theOpponenet.ConnectionId})
+                            .gameOver(winner);
+
+                        theOneThatMoves.Reinitialize();
+                        theOpponenet.Reinitialize();
+                        Games.RemoveAll(n =>
+                            n.Player1.ConnectionId == theOneThatMoves.ConnectionId ||
+                            n.Player2.ConnectionId == theOneThatMoves.ConnectionId);
+                    }
+                }
+                else
+                {
+                    //no, than switch and redo the cards that are opened
+                    Clients.Clients(new[] {theOneThatMoves.ConnectionId, theOpponenet.ConnectionId})
+                        .showChangesRedoCards(a, b, game.MoveKeeper.FirstA, game.MoveKeeper.FirstB, picture);
+
+                    //switch players
+                    theOneThatMoves.Moving = false;
+                    theOpponenet.Moving = true;
+                    Clients.Client(theOneThatMoves.ConnectionId).waitForMove();
+                    Clients.Client(theOpponenet.ConnectionId).move();
+                }
             }
+        }
+
+
+        public void SendMessage(string name, string message)
+        {
+            var sender = clients.Find(n => n.ConnectionId == Context.ConnectionId);
+            var reciever = clients.Find(n => n.Name == name);
+
+            if (sender.Opponent != reciever) return; //cant send messages if not opponent
+
+            Clients.Client(reciever.ConnectionId).gotMessage(message, sender.Name);
+        }
+
+        private void AddPoints(Player theOneThatMoves)
+        {
+            theOneThatMoves.Points++;
         }
 
 

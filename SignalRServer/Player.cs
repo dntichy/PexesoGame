@@ -8,15 +8,15 @@ namespace SignalRServer
     {
         public string ConnectionId { get; set; }
         public string Name { get; set; }
+
         public Player Opponent { get; set; }
         public bool HasInvitation { get; set; }
         public bool IsPlaying { get; set; }
         public Invitation Invitation { get; set; }
         public Pexeso GamePexeso { get; set; }
-
-        public bool WaitingForMove { get; set; }
         public bool Moving { get; set; }
         public int MoveCounter { get; set; }
+        public int Points { get; set; }
 
 
         public void Reinitialize()
@@ -26,8 +26,9 @@ namespace SignalRServer
             Invitation = null;
             GamePexeso = null;
             Moving = false;
-            WaitingForMove = false;
             Opponent = null;
+            Points = 0;
+            MoveCounter = 0;
         }
     }
 }

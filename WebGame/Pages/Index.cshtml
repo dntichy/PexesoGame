@@ -34,7 +34,7 @@
         <div class="row">
             <h4>Zvoľte typ hry:</h4>
             <form action="">
-                <input type="radio" name="gameType" value="3x2"> 3x2<br>
+                <input type="radio" checked="checked" name="gameType" value="3x2"> 3x2<br>
                 <input type="radio" name="gameType" value="4x3"> 4x3<br>
                 <input type="radio" name="gameType" value="4x4"> 4x4<br>
                 <input type="radio" name="gameType" value="5x4"> 5x4<br>
@@ -76,9 +76,18 @@
         <div class="row">
             <div class="col-6" id="moveStatus"></div>
             <div class="col-6" id="scoreBoard"></div>
-           
+
             <div class="col-6">
                 <table id='game'></table>
+            </div>
+            
+            <div class="col-6">
+                <h1>Chat</h1>
+                <input type="text" id="chatTextToSend"> <input type="button" id="chatSendMessageBtn" value="Odoslať"><br/>
+               @* <textarea style="width: 300px; height: 200px" id="chatTextArea"></textarea>*@
+                <div id="messages">
+                   
+                </div>
             </div>
         </div>
     </div>
