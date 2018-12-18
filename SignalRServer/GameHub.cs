@@ -80,7 +80,8 @@ namespace SignalRServer
 
         public Task RefreshPlayers()
         {
-            return Clients.All.listOfPlayers(clients);
+            var players = clients.Select(n => new {n.Name, n.IsPlaying, n.HasInvitation });
+            return Clients.All.listOfPlayers(players);
         }
 
         public Task SearchPlayer(string name)
