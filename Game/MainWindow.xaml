@@ -6,14 +6,14 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PexGame"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800"
+        Title="MainWindow" Height="600" Width="800"
         Loaded="Window_Loaded"
         Closed="Window_OnClosed">
 
 
     <Frame        
         HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalContentAlignment="Stretch"
-         Source="Pages/RegisterPlayerPage.xaml" VerticalContentAlignment="Stretch" x:Name="MainFrame" Margin="0,0,0,0" NavigationUIVisibility="Hidden">
+         Source="Pages/GamePage.xaml" VerticalContentAlignment="Stretch" x:Name="MainFrame" Margin="0,0,0,0" NavigationUIVisibility="Hidden">
     </Frame>
 
 </Window>

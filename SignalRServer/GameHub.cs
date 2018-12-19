@@ -241,7 +241,7 @@ namespace SignalRServer
 
                     Clients.Clients(new[] {theOneThatMoves.ConnectionId, theOpponenet.ConnectionId})
                         .showChangesScored(a, b, game.MoveKeeper.FirstA, game.MoveKeeper.FirstB, picture,
-                            theOneThatMoves);
+                            theOneThatMoves);//sends second move a,b and first move firstA, firstB
 
                     //check if game is over now
                     if (theOneThatMoves.Points + theOpponenet.Points == game.MaxPointsForGame / 2)

@@ -15,41 +15,38 @@
 
         <StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Label>Search player: </Label>
+                <Label>Search player:</Label>
                 <TextBox Name="SearchNameTextBox" Width="130" />
                 <Button Margin="0,0,10,0" Click="OnSearchPlayerClicked">Search</Button>
                 <Button Margin="0,0,10,0" Click="OnPlayGameRandomPlayerClicked">Random Player game</Button>
                 <Button Margin="0,0,10,0" Click="OnPlayGameClicked">Play</Button>
-                <Label HorizontalContentAlignment="Right" Width="301" Name="NameLabel">Player: </Label>
+                <Label HorizontalContentAlignment="Right" Width="301" Name="NameLabel">Player:</Label>
             </StackPanel>
+            <Grid Height="315">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="1*" />
+                </Grid.ColumnDefinitions>
 
-            <DataGrid HorizontalAlignment="Left" Margin="12,21,0,0"
-                      CanUserAddRows="False"
-                      Name="McDataGrid" VerticalAlignment="Top" ColumnWidth="100" Height="203"
-                      Width="600" />
-            <!--<DataGrid Name="DataGrid" Margin="0 8 0 0" ItemsSource="{Binding Players}" CanUserSortColumns="True" CanUserAddRows="False"
-                      AutoGenerateColumns="False"
-                      
-                      materialDesign:DataGridAssist.CellPadding="13 8 8 8"
-                      materialDesign:DataGridAssist.ColumnHeaderPadding="8" 
-
-                      >
-                <DataGrid.Columns >
-                    --><!--<DataGridCheckBoxColumn Binding="{Binding Name}"
-                                            ElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnStyle}"
-                                            EditingElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnEditingStyle}" />--><!--
-
-                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding Name}"
-                                                               Header="Name"
-                                                               EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}" />
-                    --><!-- set a max length to get an indicator in the editor --><!--
-                    <materialDesign:MaterialDataGridTextColumn Binding="{Binding IsPlaying}"
-                                                               Header="Status"
-                                                               MaxLength="255"
-                                                               EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}" />
-
-                </DataGrid.Columns>
-            </DataGrid>-->
+                <DataGrid Grid.Column="0" HorizontalAlignment="Left" Margin="12,21,0,-236"
+                          CanUserAddRows="False"
+                          IsReadOnly="True"
+                          SelectionMode="Single"
+                          SelectionUnit="FullRow"
+                          Name="McDataGrid" VerticalAlignment="Top" ColumnWidth="100" Width="364" Height="269" />
+                <StackPanel Grid.Column="1" Orientation="Vertical">
+                    <Label>Game type</Label>
+                    <RadioButton Margin="10,5,0,0" Checked="OnCheckRadioButton" GroupName="GameType">3x2</RadioButton>
+                    <RadioButton Margin="10,5,0,0" Checked="OnCheckRadioButton" GroupName="GameType">4x3</RadioButton>
+                    <RadioButton Margin="10,5,0,0" Checked="OnCheckRadioButton" GroupName="GameType">4x4</RadioButton>
+                    <RadioButton Margin="10,5,0,0" Checked="OnCheckRadioButton" GroupName="GameType">6x6</RadioButton>
+                    <RadioButton Margin="10,5,0,0" Checked="OnCheckRadioButton" GroupName="GameType">6x5</RadioButton>
+                    <RadioButton Margin="10,5,0,0" Checked="OnCheckRadioButton" GroupName="GameType">5x4</RadioButton>
+                    <RadioButton Margin="10,5,0,0" Checked="OnCheckRadioButton" GroupName="GameType">8x7</RadioButton>
+                    <RadioButton Margin="10,5,0,0" Checked="OnCheckRadioButton" GroupName="GameType">7x6</RadioButton>
+                    <RadioButton Margin="10,5,0,0" Checked="OnCheckRadioButton" GroupName="GameType">8x8</RadioButton>
+                </StackPanel>
+            </Grid>
         </StackPanel>
     </Grid>
 </Page>

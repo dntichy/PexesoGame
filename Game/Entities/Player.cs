@@ -11,7 +11,6 @@
         public int MoveCounter { get; set; }
         public int Points { get; set; }
 
-
         public void Reinitialize()
         {
             HasInvitation = false;

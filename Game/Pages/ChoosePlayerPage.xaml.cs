@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using Game.Entities;
 
 namespace Game.Pages
 {
@@ -9,6 +10,8 @@ namespace Game.Pages
     /// </summary>
     public partial class ChoosePlayerPage : Page
     {
+        private string _gameType;
+
         public ChoosePlayerPage()
         {
             InitializeComponent();
@@ -26,8 +29,7 @@ namespace Game.Pages
 
         private void OnPlayGameClicked(object sender, RoutedEventArgs e)
         {
-            
-            var item =  McDataGrid.SelectedItem;
+            var item = (PlayerWrapper) McDataGrid.SelectedItem;
             if (item == null)
             {
                 MessageBox.Show("Vybrete prosím hráča");
@@ -36,9 +38,13 @@ namespace Game.Pages
             {
                 MessageBox.Show("Vybrete prosím hráča, ktorý momenatálne nie je v hre");
             }
+            else if (_gameType == null)
+            {
+                MessageBox.Show("Vybrete prosím typ hry");
+            }
             else
             {
-                
+                MainWindow.Main.ChallengePlayer(item.Name, _gameType);
             }
 
             //NavigationService.Navigate(new GamePage());
@@ -50,7 +56,8 @@ namespace Game.Pages
             this.Dispatcher.Invoke(() =>
             {
                 var playersReduced = MainWindow.Main.Players
-                    .Select(n => new {n.Name, InGame = n.IsPlaying || n.HasInvitation,}).ToList();
+                    .Select(n => new PlayerWrapper()
+                        {Name = n.Name, InGame = n.IsPlaying || n.HasInvitation,}).ToList();
                 McDataGrid.ItemsSource = playersReduced;
             });
         }
@@ -63,6 +70,29 @@ namespace Game.Pages
         private void OnPlayGameRandomPlayerClicked(object sender, RoutedEventArgs e)
         {
             throw new System.NotImplementedException();
+        }
+
+        private void OnCheckRadioButton(object sender, RoutedEventArgs e)
+        {
+            var radioButton = sender as RadioButton;
+            if (radioButton != null) _gameType = radioButton.Content.ToString();
+        }
+
+        public void NavigateToWaitingCockpit()
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                WaitingCockpitPage wc = new WaitingCockpitPage();
+                NavigationService.Navigate(wc);
+            });
+        }
+
+        public void NavigateToGamePage()
+        {
+            this.Dispatcher.Invoke(() =>
+            {
+                MainWindow.Main.MainFrame.NavigationService.Navigate(MainWindow.Main.GamePage);
+            });
         }
     }
 }

@@ -72,6 +72,7 @@
     <Compile Include="Entities\Invitation.cs" />
     <Compile Include="Entities\Pexeso.cs" />
     <Compile Include="Entities\Player.cs" />
+    <Compile Include="Entities\PlayerWrapper.cs" />
     <Compile Include="Enums\GameTypes.cs" />
     <Compile Include="Pages\ChoosePlayerPage.xaml.cs">
       <DependentUpon>ChoosePlayerPage.xaml</DependentUpon>
@@ -106,8 +107,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\WaitingCockpitPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Pages\WaitingCockpitPage.xaml.cs">
+      <DependentUpon>WaitingCockpitPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

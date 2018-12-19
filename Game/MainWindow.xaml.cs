@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net.Http;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Navigation;
 using Game.Entities;
 using Game.Pages;
 using Microsoft.AspNet.SignalR.Client;
@@ -20,6 +22,7 @@ namespace Game
         public RegisterPlayerPage RegisterPage;
         public ChoosePlayerPage ChoosePlayerPage;
         public GamePage GamePage;
+        public WaitingCockpitPage WaitingCockpitPage;
         public ObservableCollection<Player> Players { get; set; }
 
         public String UserName { get; set; }
@@ -29,10 +32,12 @@ namespace Game
         const string ServerUri = "http://localhost:8084/signalr";
         public HubConnection Connection { get; set; }
 
+
         public MainWindow()
         {
             InitializeComponent();
-            ConnectAsync();
+            GamePage = new GamePage();
+
         }
 
 
@@ -42,7 +47,7 @@ namespace Game
         }
 
 
-        private async void ConnectAsync()
+        private async Task ConnectAsync()
         {
             Connection = new HubConnection(ServerUri);
             Connection.Closed += Connection_Closed;
@@ -80,17 +85,62 @@ namespace Game
             );
 
 
-            HubProxy.On("opponentDisconnected", (string opponentName) => { }
+            HubProxy.On("opponentDisconnected",
+                (string opponentName) =>
+                {
+                    MessageBox.Show("Player " + opponentName + " has disconnected the party :(");
+                    GamePage.NavigateToChoosePlayerPage();
+                }
             );
 
 
-            HubProxy.On("gotInvitation", (string opponentName) => { }
+            HubProxy.On("showChangesRedoCards",
+                (int a, int b, int x, int y, Picture picture) =>
+                {
+                   
+                }
             );
 
-            HubProxy.On("challengePlayerFailed", (string opponentName) => { }
+            HubProxy.On("showChangesScored",
+                (int a, int b, int x, int y, Picture picture, Player theOneThatMoves) =>
+                {
+
+                }
             );
 
 
+
+            HubProxy.On("gotInvitation", (string opponentName) =>
+                {
+                    if (MessageBox.Show("Accept invitation from" + opponentName + " ?",
+                            "Invitation",
+                            MessageBoxButton.YesNoCancel) == MessageBoxResult.Yes)
+                    {
+                        Opponent = opponentName;
+                        AcceptInvitation(opponentName);
+                        ChoosePlayerPage.NavigateToGamePage();
+
+                    }
+                    else
+                    {
+                        RejectInvitation(opponentName);
+                        RequestPlayers();
+                    }
+                }
+            );
+
+            HubProxy.On("challengePlayerFailed", (string opponentName) => { Console.WriteLine("Failed"); }
+            );
+            HubProxy.On("challengeAccepted", () => { ChoosePlayerPage.NavigateToGamePage(); }
+            );
+            HubProxy.On("createGameScenario", (int a, int b) =>
+                {
+                    this.Dispatcher.Invoke(() =>
+                    {
+                        Main.GamePage.CreateGameScenario(a, b);
+                    });
+                }
+            );
             HubProxy.On("move", () => { }
             );
             HubProxy.On("waitForMove", () => { }
@@ -123,8 +173,9 @@ namespace Game
             HubProxy.Invoke("RefreshPlayers");
         }
 
-        public void RegClient(string name)
+        public async Task RegClient(string name)
         {
+            await ConnectAsync();
             UserName = name;
             HubProxy.Invoke("RegisterClient", name);
         }
@@ -147,6 +198,7 @@ namespace Game
 
         public void ChallengePlayer(string name, string gameType)
         {
+            ChoosePlayerPage.NavigateToWaitingCockpit();
             HubProxy.Invoke("ChallengePlayer", name, gameType);
         }
 
@@ -162,7 +214,7 @@ namespace Game
 
         private void Window_OnClosed(object sender, EventArgs e)
         {
-            Connection.Stop();
+            //Connection.Stop();
         }
     }
 }
