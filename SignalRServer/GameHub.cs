@@ -151,12 +151,6 @@ namespace SignalRServer
             {
                 Clients.Client(Context.ConnectionId).challengePlayerFailed(name);
             }
-
-
-            //challengee.Opponent = challenger;
-            //challengee.IsPlaying = 
-            //challenger.Opponent = challengee;
-            //return Clients.All.x();
         }
 
         public void RejectInvitation(string name)

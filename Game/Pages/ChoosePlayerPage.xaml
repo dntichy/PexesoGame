@@ -16,32 +16,40 @@
         <StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label>Search player: </Label>
-                <TextBox Name="SearchNameTextBox"  Width="130" />
+                <TextBox Name="SearchNameTextBox" Width="130" />
                 <Button Margin="0,0,10,0" Click="OnSearchPlayerClicked">Search</Button>
-                <Button Margin="0,0,10,0" Click="OnPlayGameClicked">Random Player game</Button>
-                <Label  HorizontalContentAlignment="Right" Width="301" Name="NameLabel">Player: </Label>
+                <Button Margin="0,0,10,0" Click="OnPlayGameRandomPlayerClicked">Random Player game</Button>
+                <Button Margin="0,0,10,0" Click="OnPlayGameClicked">Play</Button>
+                <Label HorizontalContentAlignment="Right" Width="301" Name="NameLabel">Player: </Label>
             </StackPanel>
 
-            <DataGrid Name="DataGrid" Margin="0 8 0 0" ItemsSource="{Binding Players}" CanUserSortColumns="True" CanUserAddRows="False"
+            <DataGrid HorizontalAlignment="Left" Margin="12,21,0,0"
+                      CanUserAddRows="False"
+                      Name="McDataGrid" VerticalAlignment="Top" ColumnWidth="100" Height="203"
+                      Width="600" />
+            <!--<DataGrid Name="DataGrid" Margin="0 8 0 0" ItemsSource="{Binding Players}" CanUserSortColumns="True" CanUserAddRows="False"
                       AutoGenerateColumns="False"
+                      
                       materialDesign:DataGridAssist.CellPadding="13 8 8 8"
-                      materialDesign:DataGridAssist.ColumnHeaderPadding="8">
-                <DataGrid.Columns>
-                    <!--<DataGridCheckBoxColumn Binding="{Binding Name}"
+                      materialDesign:DataGridAssist.ColumnHeaderPadding="8" 
+
+                      >
+                <DataGrid.Columns >
+                    --><!--<DataGridCheckBoxColumn Binding="{Binding Name}"
                                             ElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnStyle}"
-                                            EditingElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnEditingStyle}" />-->
+                                            EditingElementStyle="{StaticResource MaterialDesignDataGridCheckBoxColumnEditingStyle}" />--><!--
 
                     <materialDesign:MaterialDataGridTextColumn Binding="{Binding Name}"
                                                                Header="Name"
                                                                EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}" />
-                    <!-- set a max length to get an indicator in the editor -->
+                    --><!-- set a max length to get an indicator in the editor --><!--
                     <materialDesign:MaterialDataGridTextColumn Binding="{Binding IsPlaying}"
                                                                Header="Status"
                                                                MaxLength="255"
                                                                EditingElementStyle="{StaticResource MaterialDesignDataGridTextColumnPopupEditingStyle}" />
 
                 </DataGrid.Columns>
-            </DataGrid>
+            </DataGrid>-->
         </StackPanel>
     </Grid>
 </Page>

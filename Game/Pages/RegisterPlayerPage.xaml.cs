@@ -22,8 +22,7 @@ namespace Game.Pages
 
         private void OnRegisterUserClicked(object sender, RoutedEventArgs e)
         {
-            MainWindow.Main.UserName = NickNameTextBox.Text;
-            MainWindow.Main.RegClient();
+            MainWindow.Main.RegClient(NickNameTextBox.Text);
         }
 
 

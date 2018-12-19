@@ -19,15 +19,15 @@ namespace Game
 
         public RegisterPlayerPage RegisterPage;
         public ChoosePlayerPage ChoosePlayerPage;
-
+        public GamePage GamePage;
         public ObservableCollection<Player> Players { get; set; }
 
         public String UserName { get; set; }
+        public String Opponent { get; set; }
 
         public IHubProxy HubProxy { get; set; }
         const string ServerUri = "http://localhost:8084/signalr";
         public HubConnection Connection { get; set; }
-        public string TestProp { get; set; }
 
         public MainWindow()
         {
@@ -35,7 +35,6 @@ namespace Game
             ConnectAsync();
         }
 
-  
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -48,7 +47,7 @@ namespace Game
             Connection = new HubConnection(ServerUri);
             Connection.Closed += Connection_Closed;
             HubProxy = Connection.CreateHubProxy("GameHub");
-         
+
             HubProxy.On("registerComplete", () =>
             {
                 Console.WriteLine("Completed Registration");
@@ -80,13 +79,27 @@ namespace Game
                 }
             );
 
-            //Handle incoming event from server: use Invoke to write to console from SignalR's thread
-            //HubProxy.On<string, string>("AddMessage", (name, message) =>
-            //    this.Dispatcher.Invoke(() =>
-            //        RichTextBoxConsole.AppendText(String.Format("{0}: {1}\r", name, message))
-            //    )
-            //);
 
+            HubProxy.On("opponentDisconnected", (string opponentName) => { }
+            );
+
+
+            HubProxy.On("gotInvitation", (string opponentName) => { }
+            );
+
+            HubProxy.On("challengePlayerFailed", (string opponentName) => { }
+            );
+
+
+            HubProxy.On("move", () => { }
+            );
+            HubProxy.On("waitForMove", () => { }
+            );
+            HubProxy.On("gameOver", (string winnerName) => { }
+            );
+
+            HubProxy.On("gotMessage", (string message, string fromUser) => { }
+            );
 
             try
             {
@@ -103,7 +116,6 @@ namespace Game
         {
             Console.WriteLine("con closed");
             System.Windows.Application.Current.Shutdown();
-
         }
 
         public void RequestPlayers()
@@ -111,14 +123,41 @@ namespace Game
             HubProxy.Invoke("RefreshPlayers");
         }
 
-        public void RegClient()
+        public void RegClient(string name)
         {
-            HubProxy.Invoke("RegisterClient", UserName);
+            UserName = name;
+            HubProxy.Invoke("RegisterClient", name);
         }
 
         public void SearchPlayer(string searchName)
         {
             HubProxy.Invoke("SearchPlayer", searchName);
+        }
+
+
+        public void AcceptInvitation(string name)
+        {
+            HubProxy.Invoke("AcceptInvitation", name);
+        }
+
+        public void RejectInvitation(string name)
+        {
+            HubProxy.Invoke("RejectInvitation", name);
+        }
+
+        public void ChallengePlayer(string name, string gameType)
+        {
+            HubProxy.Invoke("ChallengePlayer", name, gameType);
+        }
+
+        public void Moved(int a, int b)
+        {
+            HubProxy.Invoke("Moved", a, b);
+        }
+
+        public void SendMessage(string name, string message)
+        {
+            HubProxy.Invoke("SendMessage", name, message);
         }
 
         private void Window_OnClosed(object sender, EventArgs e)

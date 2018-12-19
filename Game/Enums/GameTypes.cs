@@ -1,6 +1,6 @@
 ﻿namespace Game.Enums
 {
-    public enum MessageType
+    public enum GameTypes
     {
         TriXDva,
         StyriXTri,
