@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SignalRServer", "SignalRSer
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebGame", "WebGame\WebGame.csproj", "{9C5E6BC7-F953-4808-A55A-A934C515D84D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPI", "WebAPI\WebAPI.csproj", "{A56175DD-BE11-4D8A-B0B4-8B23996F097B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{9C5E6BC7-F953-4808-A55A-A934C515D84D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9C5E6BC7-F953-4808-A55A-A934C515D84D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9C5E6BC7-F953-4808-A55A-A934C515D84D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A56175DD-BE11-4D8A-B0B4-8B23996F097B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A56175DD-BE11-4D8A-B0B4-8B23996F097B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A56175DD-BE11-4D8A-B0B4-8B23996F097B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A56175DD-BE11-4D8A-B0B4-8B23996F097B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
