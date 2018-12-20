@@ -296,6 +296,27 @@ namespace SignalRServer
             Clients.Client(reciever.ConnectionId).gotMessage(message, sender.Name);
         }
 
+
+        public void Disconnect()
+        {
+            var game = Games.FirstOrDefault(x =>
+                x.Player1.ConnectionId == Context.ConnectionId || x.Player2.ConnectionId == Context.ConnectionId);
+            var theOneThatDisconnects = clients.Find(n => n.ConnectionId == Context.ConnectionId);
+
+            var theOpponenet = theOneThatDisconnects.Opponent;
+
+            theOneThatDisconnects.Reinitialize();
+            theOpponenet.Reinitialize();
+
+            Games.RemoveAll(n =>
+                n.Player1.ConnectionId == theOneThatDisconnects.ConnectionId ||
+                n.Player2.ConnectionId == theOneThatDisconnects.ConnectionId);
+
+            Clients.Client(theOpponenet.ConnectionId).opponentDisconnected(theOneThatDisconnects.Name);
+        }
+
+
+
         private void AddPoints(Player theOneThatMoves)
         {
             theOneThatMoves.Points++;

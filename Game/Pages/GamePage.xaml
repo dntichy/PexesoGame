@@ -19,11 +19,18 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="2*" />
                 <RowDefinition Height="12*" />
+                <RowDefinition Height="1*" />
             </Grid.RowDefinitions>
 
-            <Label Grid.Row="0" Content="Pexeso game" HorizontalAlignment="Left" Margin="10,10,0,0"
-                   VerticalAlignment="Top"
-                   RenderTransformOrigin="-1.316,-0.385" Height="35" Width="185" FontSize="16" FontWeight="Bold" />
+<StackPanel Orientation="Vertical">
+    <Label Content="Pexeso game" HorizontalAlignment="Left" Margin="10,10,0,0"
+           VerticalAlignment="Top"
+           RenderTransformOrigin="-1.316,-0.385" Height="35" Width="185" FontSize="16" FontWeight="Bold" />
+    <Label Content="" Name="TurnSwitcherText" HorizontalAlignment="Left" Margin="10,0,0,0"
+           VerticalAlignment="Top"
+           RenderTransformOrigin="-1.316,-0.385" Height="35" Width="330" FontSize="16" FontWeight="Bold" />
+            </StackPanel>
+    
             <StackPanel Grid.Column="1" Grid.Row="0" Background="Chartreuse">
                 <Label Content="ScoreBoard" HorizontalAlignment="Center" Margin="0,0,0,0"
                        VerticalAlignment="Top"
@@ -33,18 +40,21 @@
                        RenderTransformOrigin="-1.316,-0.385" FontSize="10" FontWeight="Bold" />
                 <Label Content="Opponent:" Name="ScoreTrackOpp" HorizontalAlignment="Left" Margin="0,0,0,0"
                        VerticalAlignment="Top"
-                       RenderTransformOrigin="-1.316,-0.385"  FontSize="10" FontWeight="Bold" />
+                       RenderTransformOrigin="-1.316,-0.385" FontSize="10" FontWeight="Bold" />
 
             </StackPanel>
 
             <Grid Grid.Column="0" Name="GameGrid" HorizontalAlignment="Left" Margin="10,10,0,0"
                   VerticalAlignment="Top" Grid.Row="1" />
             <StackPanel Grid.Column="1" Grid.Row="1">
-                <TextBox Background="BurlyWood" Name="Message" Height="24" Text="send message.." Padding="2,0,0,0"/>
+                <Label Content="Chat" HorizontalAlignment="Center" Margin="0,0,0,0"
+                       VerticalAlignment="Top"
+                       RenderTransformOrigin="-1.316,-0.385" FontSize="16" FontWeight="Bold" />
+                <TextBox BorderBrush="Black" Background="AliceBlue" Name="Message" Height="24" Text="" Padding="2,0,0,0" Margin="5" />
                 <Button Height="24" FontSize="12" Click="SendMessage" Background="SaddleBrown" Foreground="Black">SEND</Button>
                 <ListBox Name="MessageConsole" Background="BurlyWood" />
             </StackPanel>
-
+            <ProgressBar Background="AliceBlue" Foreground="Green" Grid.Column="0" Grid.Row="2" Height="20" Name="ProgressBar"/>
         </Grid>
 
 

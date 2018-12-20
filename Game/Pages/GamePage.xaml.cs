@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Game.Entities;
 
 namespace Game.Pages
@@ -16,13 +18,36 @@ namespace Game.Pages
     /// </summary>
     public partial class GamePage : Page
     {
-        public readonly List<Button> ListOfButtonsToDelete;
+        private DispatcherTimer _timer;
 
         public GamePage()
         {
-            this.ListOfButtonsToDelete = new List<Button>();
             InitializeComponent();
+            _timer = new DispatcherTimer {Interval = TimeSpan.FromSeconds(1)};
+            _timer.Tick += Timer_Tick;
         }
+
+        private void Timer_Tick(object sender, EventArgs e)
+        {
+            ProgressBar.Value++;
+
+            if (ProgressBar.Value.Equals(ProgressBar.Maximum))
+            {
+                _timer.Tick -= Timer_Tick;
+                _timer.Stop();
+                MessageBox.Show("You were disconnected from the party :)");
+                MainWindow.Main.DisconnectFromParty();
+                MainWindow.Main.MainFrame.NavigationService.Navigate(MainWindow.Main.ChoosePlayerPage);
+            }
+        }
+
+        private void InitializeTimer()
+        {
+            ProgressBar.Maximum = 60;
+            ProgressBar.Value = 0;
+            _timer.Stop();
+        }
+
 
         public void NavigateToChoosePlayerPage()
         {
@@ -70,7 +95,6 @@ namespace Game.Pages
                         Height = 80,
                         Width = 80
                     };
-                    ListOfButtonsToDelete.Add(batak);
                     batak.Click += this.ClickOnCardHandler;
 
                     GameGrid.Children.Add(batak);
@@ -125,7 +149,10 @@ namespace Game.Pages
                 {
                     UIElement TheElement = element as UIElement;
                     TheElement.IsEnabled = false;
+                    TurnSwitcherText.Content = "IT'S OPPONENT'S TURN";
                 }
+
+                InitializeTimer();
             });
         }
 
@@ -137,7 +164,11 @@ namespace Game.Pages
                 {
                     UIElement TheElement = element as UIElement;
                     TheElement.IsEnabled = true;
+                    TurnSwitcherText.Content = "IT'S YOUR TURN";
                 }
+
+                InitializeTimer();
+                _timer.Start();
             });
         }
 
@@ -186,6 +217,7 @@ namespace Game.Pages
         {
             Dispatcher.Invoke(async () =>
             {
+                InitializeTimer();
                 AddPictureToImage(i, i1, picture);
 
                 await Task.Delay(1500);
@@ -198,6 +230,8 @@ namespace Game.Pages
         {
             Dispatcher.Invoke(async () =>
             {
+                InitializeTimer();
+
                 AddPictureToImage(i, i1, picture);
 
                 //add score to theOneThatMoves
@@ -244,8 +278,8 @@ namespace Game.Pages
         {
             Dispatcher.Invoke(() =>
             {
-                MessageBox.Show("Winner is " + winnerName);
-
+                InitializeTimer();
+                MessageBox.Show(winnerName == MainWindow.Main.UserName ? "CONGRATULATIONS YOU WON :)" : "YOU LOSE :(");
                 MainWindow.Main.MainFrame.NavigationService.Navigate(MainWindow.Main.ChoosePlayerPage);
             });
         }

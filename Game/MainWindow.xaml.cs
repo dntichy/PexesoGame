@@ -4,7 +4,6 @@ using System.Collections.ObjectModel;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Navigation;
 using Game.Entities;
 using Game.Pages;
 using Microsoft.AspNet.SignalR.Client;
@@ -137,7 +136,7 @@ namespace Game
             );
             HubProxy.On("waitForMove", () => { GamePage.DisableAllControll(); }
             );
-            HubProxy.On("gameOver", (string winnerName) => { GamePage.GameOver(winnerName); }
+            HubProxy.On("gameOver", (Player winnerName) => { GamePage.GameOver(winnerName.Name); }
             );
 
             HubProxy.On("gotMessage",
@@ -209,6 +208,11 @@ namespace Game
         private void Window_OnClosed(object sender, EventArgs e)
         {
             Connection?.Stop();
+        }
+
+        public void DisconnectFromParty()
+        {
+            HubProxy.Invoke("Disconnect");
         }
     }
 }
