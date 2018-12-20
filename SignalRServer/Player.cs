@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using SignalRServer.Enums;
-
-namespace SignalRServer
+﻿namespace SignalRServer
 {
     public class Player
     {
