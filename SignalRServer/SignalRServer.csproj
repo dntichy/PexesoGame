@@ -101,7 +101,6 @@
   <ItemGroup>
     <Compile Include="Enums\GameTypes.cs" />
     <Compile Include="GameHub.cs" />
-    <Compile Include="GameInformation.cs" />
     <Compile Include="Invitation.cs" />
     <Compile Include="MainTest.cs" />
     <Compile Include="Pexeso.cs" />

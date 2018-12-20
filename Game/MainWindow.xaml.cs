@@ -27,6 +27,7 @@ namespace Game
 
         public String UserName { get; set; }
         public String Opponent { get; set; }
+        public String PotentialOpponent { get; set; }
 
         public IHubProxy HubProxy { get; set; }
         const string ServerUri = "http://localhost:8084/signalr";
@@ -37,7 +38,6 @@ namespace Game
         {
             InitializeComponent();
             GamePage = new GamePage();
-
         }
 
 
@@ -95,20 +95,18 @@ namespace Game
 
 
             HubProxy.On("showChangesRedoCards",
-                (int a, int b, int x, int y, Picture picture) =>
-                {
-                   
-                }
+                (int a, int b, int x, int y, Picture picture) => { GamePage.ShowChangesRedoCards(a, b, x, y, picture); }
             );
 
             HubProxy.On("showChangesScored",
                 (int a, int b, int x, int y, Picture picture, Player theOneThatMoves) =>
                 {
-
+                    GamePage.ShowChangesScored(a, b, x, y, picture, theOneThatMoves);
                 }
             );
-
-
+            HubProxy.On("showChanges",
+                (int a, int b, Picture picture) => { GamePage.ShowChanges(a, b, picture); }
+            );
 
             HubProxy.On("gotInvitation", (string opponentName) =>
                 {
@@ -119,7 +117,6 @@ namespace Game
                         Opponent = opponentName;
                         AcceptInvitation(opponentName);
                         ChoosePlayerPage.NavigateToGamePage();
-
                     }
                     else
                     {
@@ -133,22 +130,18 @@ namespace Game
             );
             HubProxy.On("challengeAccepted", () => { ChoosePlayerPage.NavigateToGamePage(); }
             );
-            HubProxy.On("createGameScenario", (int a, int b) =>
-                {
-                    this.Dispatcher.Invoke(() =>
-                    {
-                        Main.GamePage.CreateGameScenario(a, b);
-                    });
-                }
+            HubProxy.On("createGameScenario",
+                (int a, int b) => { this.Dispatcher.Invoke(() => { Main.GamePage.CreateGameScenario(a, b); }); }
             );
-            HubProxy.On("move", () => { }
+            HubProxy.On("move", () => { GamePage.EnableAllControll(); }
             );
-            HubProxy.On("waitForMove", () => { }
+            HubProxy.On("waitForMove", () => { GamePage.DisableAllControll(); }
             );
-            HubProxy.On("gameOver", (string winnerName) => { }
+            HubProxy.On("gameOver", (string winnerName) => { GamePage.GameOver(winnerName); }
             );
 
-            HubProxy.On("gotMessage", (string message, string fromUser) => { }
+            HubProxy.On("gotMessage",
+                (string message, string fromUser) => { GamePage.MessageRecieved(message, fromUser); }
             );
 
             try
@@ -198,6 +191,7 @@ namespace Game
 
         public void ChallengePlayer(string name, string gameType)
         {
+            PotentialOpponent = name;
             ChoosePlayerPage.NavigateToWaitingCockpit();
             HubProxy.Invoke("ChallengePlayer", name, gameType);
         }
@@ -214,7 +208,7 @@ namespace Game
 
         private void Window_OnClosed(object sender, EventArgs e)
         {
-            //Connection.Stop();
+            Connection?.Stop();
         }
     }
 }

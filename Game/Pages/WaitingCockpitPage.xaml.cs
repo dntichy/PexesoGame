@@ -20,7 +20,12 @@ namespace Game.Pages
 
         private void CancelInvitation(object sender, RoutedEventArgs e)
         {
-            MainWindow.Main.RejectInvitation(MainWindow.Main.Opponent);
+            MainWindow.Main.RejectInvitation(MainWindow.Main.PotentialOpponent);
+
+            Dispatcher.Invoke(() =>
+            {
+                MainWindow.Main.MainFrame.NavigationService.Navigate(MainWindow.Main.ChoosePlayerPage);
+            });
         }
     }
 }

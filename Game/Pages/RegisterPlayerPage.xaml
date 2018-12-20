@@ -12,11 +12,11 @@
 
     <Grid>
         <StackPanel>
-            <Label FontSize="30">Welcome to my Pexeso game</Label>
+            <Label FontSize="30">Welcome to Pexeso</Label>
             <StackPanel Orientation="Horizontal">
-                <Label>Enter your nickname:</Label>
-                <TextBox Name="NickNameTextBox" Width="100" />
-                <Button Click="OnRegisterUserClicked">Next</Button>
+                <Label FontSize="20">Enter your nickname:</Label>
+                <TextBox Margin="10,0,10,0" Name="NickNameTextBox" Width="100" />
+                <Button Click="OnRegisterUserClicked">Register</Button>
             </StackPanel>
         </StackPanel>
     </Grid>

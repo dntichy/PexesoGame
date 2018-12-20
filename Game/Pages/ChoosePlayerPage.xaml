@@ -15,27 +15,28 @@
 
         <StackPanel>
             <StackPanel Orientation="Horizontal">
-                <Label>Search player:</Label>
-                <TextBox Name="SearchNameTextBox" Width="130" />
-                <Button Margin="0,0,10,0" Click="OnSearchPlayerClicked">Search</Button>
-                <Button Margin="0,0,10,0" Click="OnPlayGameRandomPlayerClicked">Random Player game</Button>
-                <Button Margin="0,0,10,0" Click="OnPlayGameClicked">Play</Button>
-                <Label HorizontalContentAlignment="Right" Width="301" Name="NameLabel">Player:</Label>
+                <Label  VerticalAlignment="Center" FontSize="20">FIND PLAYER:</Label>
+                <TextBox  VerticalAlignment="Center" Name="SearchNameTextBox" Width="130" />
+                <Button  VerticalAlignment="Center" Margin="10,10,10,10" Click="OnSearchPlayerClicked">Search</Button>
+                <Button  VerticalAlignment="Center" Margin="0,10,10,10" Click="OnPlayGameRandomPlayerClicked">Random Player game</Button>
+                <Button  VerticalAlignment="Center" Margin="0,10,10,10" Click="OnPlayGameClicked">Play</Button>
+                <Label HorizontalContentAlignment="Right" VerticalAlignment="Center" Margin="10,10,10,10" FontSize="20"  Name="NameLabel">Player:</Label>
             </StackPanel>
             <Grid Height="315">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*" />
-                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="64*" />
+                    <ColumnDefinition Width="61*" />
+                    <ColumnDefinition Width="35*"/>
                 </Grid.ColumnDefinitions>
 
-                <DataGrid Grid.Column="0" HorizontalAlignment="Left" Margin="12,21,0,-236"
+                <DataGrid Grid.Column="0" HorizontalAlignment="Left" Margin="20,20,0,0"
                           CanUserAddRows="False"
                           IsReadOnly="True"
                           SelectionMode="Single"
                           SelectionUnit="FullRow"
-                          Name="McDataGrid" VerticalAlignment="Top" ColumnWidth="100" Width="364" Height="269" />
-                <StackPanel Grid.Column="1" Orientation="Vertical">
-                    <Label>Game type</Label>
+                          Name="McDataGrid" VerticalAlignment="Top" ColumnWidth="100" Width="278" Height="269" />
+                <StackPanel Grid.Column="1" Orientation="Vertical" Grid.ColumnSpan="2">
+                    <Label FontSize="15">Game type</Label>
                     <RadioButton Margin="10,5,0,0" Checked="OnCheckRadioButton" GroupName="GameType">3x2</RadioButton>
                     <RadioButton Margin="10,5,0,0" Checked="OnCheckRadioButton" GroupName="GameType">4x3</RadioButton>
                     <RadioButton Margin="10,5,0,0" Checked="OnCheckRadioButton" GroupName="GameType">4x4</RadioButton>
