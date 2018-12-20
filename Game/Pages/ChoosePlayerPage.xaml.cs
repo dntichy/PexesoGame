@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using Game.Entities;
@@ -46,8 +48,6 @@ namespace Game.Pages
             {
                 MainWindow.Main.ChallengePlayer(item.Name, _gameType);
             }
-
-            //NavigationService.Navigate(new GamePage());
         }
 
         public void RereshGui()
@@ -69,7 +69,29 @@ namespace Game.Pages
 
         private void OnPlayGameRandomPlayerClicked(object sender, RoutedEventArgs e)
         {
-            throw new System.NotImplementedException();
+            Random r = new Random();
+
+
+            List<PlayerWrapper> players = McDataGrid.Items.Cast<PlayerWrapper>().ToList();
+
+            var playersReduced = players.Where(n => n.InGame == false).ToList();
+
+            var count = playersReduced.Count;
+
+
+            var random = r.Next(count);
+
+            var item = playersReduced[random];
+
+
+            if (_gameType == null)
+            {
+                MessageBox.Show("Vybrete prosím typ hry");
+            }
+            else
+            {
+                MainWindow.Main.ChallengePlayer(item.Name, _gameType);
+            }
         }
 
         private void OnCheckRadioButton(object sender, RoutedEventArgs e)
