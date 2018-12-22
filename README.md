@@ -1,0 +1,10 @@
+# PexesoGame
+SignalR
+
+1. START FIRST
+SIGNAL SERVER
+WEB API
+
+THAN 
+2. CLIENTS 
+
