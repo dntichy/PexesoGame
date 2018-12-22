@@ -85,7 +85,11 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http.Formatting">
+      <HintPath>..\..\..\..\..\..\Program Files\dotnet\sdk\NuGetFallbackFolder\microsoft.aspnet.webapi.client\5.2.6\lib\netstandard2.0\System.Net.Http.Formatting.dll</HintPath>
+    </Reference>
     <Reference Include="System.Security" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Cors, Version=5.2.7.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -99,11 +103,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ApiClient.cs" />
     <Compile Include="Enums\GameTypes.cs" />
     <Compile Include="GameHub.cs" />
-    <Compile Include="Invitation.cs" />
-    <Compile Include="Pexeso.cs" />
-    <Compile Include="Player.cs" />
+    <Compile Include="Enums\GameResult.cs" />
+    <Compile Include="Entities\Invitation.cs" />
+    <Compile Include="Entities\Pexeso.cs" />
+    <Compile Include="Entities\Player.cs" />
+    <Compile Include="Entities\PlayerWrap.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

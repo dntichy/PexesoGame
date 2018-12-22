@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.SignalR;
+using SignalRServer.Entities;
 using SignalRServer.Enums;
 
 namespace SignalRServer
@@ -10,17 +11,16 @@ namespace SignalRServer
     public class GameHub : Hub
     {
         private static readonly object SyncRoot = new object();
-        private static int _gamesPlayed = 0;
-        private static readonly List<Player> clients = new List<Player>();
+        private static readonly List<Player> Players = new List<Player>();
         private static readonly List<Pexeso> Games = new List<Pexeso>();
+        private ApiClient _apiClient = new ApiClient();
 
 
         public override Task OnDisconnected(bool stopCalled)
         {
             Console.WriteLine("DISCONNECTED");
-
-            var Player = clients.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
-            clients.RemoveAll(p => p.ConnectionId == Context.ConnectionId);
+            var Player = Players.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
+            Players.RemoveAll(p => p.ConnectionId == Context.ConnectionId);
 
             if (Player?.Opponent != null)
             {
@@ -41,24 +41,14 @@ namespace SignalRServer
             return base.OnConnected();
         }
 
-        public Task SendStatsUpdate()
-        {
-            return Clients.All.refreshAmountOfPlayers(new
-            {
-                totalGamesPlayed = _gamesPlayed,
-                amountOfGames = Games.Count,
-                amountOfClients = clients.Count
-            });
-        }
-
-        public void RegisterClient(string data)
+        public async void RegisterClient(string data)
         {
             lock (SyncRoot)
             {
-                var Player = clients.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
+                var Player = Players.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
 
                 //user already exists
-                if (clients.Exists(n => n.Name == data))
+                if (Players.Exists(n => n.Name == data))
                 {
                     Clients.Client(Context.ConnectionId).registerCantCompleted();
                     return;
@@ -67,9 +57,8 @@ namespace SignalRServer
                 //if (Player == null)
                 //{
                 Player = new Player {ConnectionId = Context.ConnectionId, Name = data};
-                clients.Add(Player);
+                Players.Add(Player);
                 //}
-
                 Player.IsPlaying = false;
             }
 
@@ -79,25 +68,25 @@ namespace SignalRServer
 
         public Task RefreshPlayers()
         {
-            var players = clients.Select(n => new {n.Name, n.IsPlaying, n.HasInvitation });
-            return Clients.All.listOfPlayers(players);
+            var lPlayers = Players.Select(n => new {n.Name, n.IsPlaying, n.HasInvitation});
+            return Clients.All.listOfPlayers(lPlayers);
         }
 
         public Task SearchPlayer(string name)
         {
             return Clients.Client(Context.ConnectionId)
-                .listOfSearchedPlayers(clients.FindAll(n => n.Name.ToLower().Contains(name.ToLower())));
+                .listOfSearchedPlayers(Players.FindAll(n => n.Name.ToLower().Contains(name.ToLower())));
         }
 
 
-        public void ChallengePlayer(string name, string gameType)
+        public async void ChallengePlayer(string name, string gameType)
         {
             //je hrac v hre? => posli fail status
 
             //posli mu challenge, nastav obom isPlaying na true
             //nastav openentov jeden druhemu
-            var challenger = clients.Find(c => c.ConnectionId == Context.ConnectionId);
-            var challengee = clients.Find(c => c.Name == name);
+            var challenger = Players.Find(c => c.ConnectionId == Context.ConnectionId);
+            var challengee = Players.Find(c => c.Name == name);
 
             GameTypes GameType = GameTypes.TriXDva;
             switch (gameType)
@@ -154,8 +143,8 @@ namespace SignalRServer
 
         public void RejectInvitation(string name)
         {
-            var challengee = clients.Find(c => c.ConnectionId == Context.ConnectionId);
-            var challenger = clients.Find(c => c.Name == name);
+            var challengee = Players.Find(c => c.ConnectionId == Context.ConnectionId);
+            var challenger = Players.Find(c => c.Name == name);
             challengee.HasInvitation = false;
             challenger.HasInvitation = false;
             challenger.Invitation = null;
@@ -168,8 +157,8 @@ namespace SignalRServer
         //invitation od uzivatela name accepted
         public void AcceptInvitation(string name)
         {
-            var challengee = clients.Find(c => c.ConnectionId == Context.ConnectionId); //vyzyvany
-            var challenger = clients.Find(c => c.Name == name); //vyzyvatel
+            var challengee = Players.Find(c => c.ConnectionId == Context.ConnectionId); //vyzyvany
+            var challenger = Players.Find(c => c.Name == name); //vyzyvatel
 
             Pexeso newPexesoGame = new Pexeso()
             {
@@ -198,12 +187,12 @@ namespace SignalRServer
             Clients.Client(challenger.ConnectionId).waitForMove();
         }
 
-        public void Moved(int a, int b)
+        public async void Moved(int a, int b)
         {
             var game = Games.FirstOrDefault(x =>
                 x.Player1.ConnectionId == Context.ConnectionId || x.Player2.ConnectionId == Context.ConnectionId);
-            var theOneThatMoves = clients.Find(n => n.ConnectionId == Context.ConnectionId);
-            var theOpponenet = clients.Find(n => n.ConnectionId == Context.ConnectionId).Opponent;
+            var theOneThatMoves = Players.Find(n => n.ConnectionId == Context.ConnectionId);
+            var theOpponenet = Players.Find(n => n.ConnectionId == Context.ConnectionId).Opponent;
 
             if (!theOneThatMoves.Moving) return; //if was able to call this request but should be waiting
 
@@ -215,6 +204,8 @@ namespace SignalRServer
                 game.MoveKeeper.FirstA = a;
                 game.MoveKeeper.FirstB = b;
                 theOneThatMoves.MoveCounter++;
+                theOneThatMoves.TotalMoves++;
+
                 Clients.Clients(new[] {theOneThatMoves.ConnectionId, theOpponenet.ConnectionId})
                     .showChanges(a, b, picture);
                 Clients.Client(Context.ConnectionId).move();
@@ -225,6 +216,7 @@ namespace SignalRServer
 
                 game.MoveKeeper.SecondA = a;
                 game.MoveKeeper.SecondB = b;
+                theOneThatMoves.TotalScore++;
 
                 var picture1 = game.GameField[game.MoveKeeper.FirstA, game.MoveKeeper.FirstB];
                 var picture2 = game.GameField[a, b];
@@ -240,7 +232,7 @@ namespace SignalRServer
 
                     Clients.Clients(new[] {theOneThatMoves.ConnectionId, theOpponenet.ConnectionId})
                         .showChangesScored(a, b, game.MoveKeeper.FirstA, game.MoveKeeper.FirstB, picture,
-                            theOneThatMoves);//sends second move a,b and first move firstA, firstB
+                            theOneThatMoves); //sends second move a,b and first move firstA, firstB
 
                     //check if game is over now
                     if (theOneThatMoves.Points + theOpponenet.Points == game.MaxPointsForGame / 2)
@@ -249,19 +241,44 @@ namespace SignalRServer
                         if (theOneThatMoves.Points > theOpponenet.Points)
                         {
                             winner = theOneThatMoves;
+                            theOneThatMoves.GameResult = GameResult.WIN;
+                            theOpponenet.GameResult = GameResult.LOST;
                         }
                         else if (theOneThatMoves.Points == theOpponenet.Points)
                         {
                             winner = null;
+                            theOneThatMoves.GameResult = GameResult.DRAW;
+                            theOpponenet.GameResult = GameResult.DRAW;
                         }
                         else
                         {
                             winner = theOpponenet;
+                            theOneThatMoves.GameResult = GameResult.LOST;
+                            theOpponenet.GameResult = GameResult.WIN;
                         }
 
                         Clients.Clients(new[] {theOneThatMoves.ConnectionId, theOpponenet.ConnectionId})
                             .gameOver(winner);
 
+                        var pl = new PlayerWrap()
+                        {
+                            ConnectionId = theOneThatMoves.ConnectionId,
+                            Points = theOneThatMoves.Points,
+                            Name = theOneThatMoves.Name,
+                            Opponent = theOneThatMoves.Opponent.Name,
+                            GameType = theOneThatMoves.GamePexeso.GameType,
+                            GameStart = theOneThatMoves.GamePexeso.GameStart,
+                            GameFinish = new DateTime(),
+                            GameResult = theOneThatMoves.GameResult,
+                            TotalMoves = theOneThatMoves.TotalMoves,
+                            TotalScore = theOneThatMoves.TotalScore
+                        };
+
+                        //call web api for persistance stuff
+                        await _apiClient.CreateProductAsync(pl);
+
+
+                        //clean up
                         theOneThatMoves.Reinitialize();
                         theOpponenet.Reinitialize();
                         Games.RemoveAll(n =>
@@ -287,8 +304,8 @@ namespace SignalRServer
 
         public void SendMessage(string name, string message)
         {
-            var sender = clients.Find(n => n.ConnectionId == Context.ConnectionId);
-            var reciever = clients.Find(n => n.Name == name);
+            var sender = Players.Find(n => n.ConnectionId == Context.ConnectionId);
+            var reciever = Players.Find(n => n.Name == name);
 
             if (sender.Opponent != reciever) return; //cant send messages if not opponent
 
@@ -300,7 +317,7 @@ namespace SignalRServer
         {
             var game = Games.FirstOrDefault(x =>
                 x.Player1.ConnectionId == Context.ConnectionId || x.Player2.ConnectionId == Context.ConnectionId);
-            var theOneThatDisconnects = clients.Find(n => n.ConnectionId == Context.ConnectionId);
+            var theOneThatDisconnects = Players.Find(n => n.ConnectionId == Context.ConnectionId);
 
             var theOpponenet = theOneThatDisconnects.Opponent;
 
@@ -313,7 +330,6 @@ namespace SignalRServer
 
             Clients.Client(theOpponenet.ConnectionId).opponentDisconnected(theOneThatDisconnects.Name);
         }
-
 
 
         private void AddPoints(Player theOneThatMoves)

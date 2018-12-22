@@ -1,15 +1,12 @@
 ﻿using System;
 using System.IO;
-using SignalRServer.Enums;
+using WebAPI.Enums;
 
-namespace SignalRServer
+namespace WebAPI.Models
 {
     public class Pexeso
     {
-        public bool IsGameOver { get; private set; }
-
-        public bool IsDraw { get; private set; }
-
+      
         public Player Player1 { get; set; }
 
         public Player Player2 { get; set; }

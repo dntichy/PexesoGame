@@ -1,6 +1,6 @@
 ﻿using SignalRServer.Enums;
 
-namespace SignalRServer
+namespace SignalRServer.Entities
 {
     public class Invitation
     {

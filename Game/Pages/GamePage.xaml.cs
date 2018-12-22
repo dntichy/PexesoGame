@@ -276,6 +276,12 @@ namespace Game.Pages
             Dispatcher.Invoke(() =>
             {
                 InitializeTimer();
+
+                if (winnerName == null)
+                {
+                    MessageBox.Show("IT's A DRAW :) CONGRATULATIONS");
+                }
+
                 MessageBox.Show(winnerName == MainWindow.Main.UserName ? "CONGRATULATIONS YOU WON :)" : "YOU LOSE :(");
                 MainWindow.Main.MainFrame.NavigationService.Navigate(MainWindow.Main.ChoosePlayerPage);
             });

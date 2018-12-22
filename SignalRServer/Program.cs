@@ -15,7 +15,7 @@ namespace SignalRServer
         {
 
             var serializerSettings = new JsonSerializerSettings();
-            serializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Serialize;
+            serializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
             serializerSettings.PreserveReferencesHandling = PreserveReferencesHandling.Objects;
 
             var serializer = JsonSerializer.Create(serializerSettings);
@@ -36,6 +36,8 @@ namespace SignalRServer
             app.UseCors(CorsOptions.AllowAll);
             app.MapSignalR();
             app.MapSignalR("/signalr", new HubConfiguration());
+
+        
         }
     }
 }
