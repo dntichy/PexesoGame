@@ -13,7 +13,7 @@ namespace SignalRServer
 {
     class ApiClient
     {
-        private static HttpClient _client = new HttpClient();
+        private readonly HttpClient _client = new HttpClient();
 
         public ApiClient()
         {
@@ -30,10 +30,6 @@ namespace SignalRServer
           
             HttpResponseMessage response = await _client.PostAsJsonAsync("api/players", player);
             response.EnsureSuccessStatusCode();
-
-
-            //HttpResponseMessage response = await _client.PostAsJsonAsync("api/players", player);
-            //response.EnsureSuccessStatusCode();
 
             // return URI of the created resource.
             return response.Headers.Location;

@@ -165,7 +165,7 @@ namespace SignalRServer
                 Player1 = challenger,
                 Player2 = challengee,
                 GameType = challengee.Invitation.GameType,
-                GameStart = new DateTime()
+                GameStart = DateTime.Now
             };
             newPexesoGame.InitializeGameField();
             Games.Add(newPexesoGame);
@@ -216,7 +216,6 @@ namespace SignalRServer
 
                 game.MoveKeeper.SecondA = a;
                 game.MoveKeeper.SecondB = b;
-                theOneThatMoves.TotalScore++;
 
                 var picture1 = game.GameField[game.MoveKeeper.FirstA, game.MoveKeeper.FirstB];
                 var picture2 = game.GameField[a, b];
@@ -268,14 +267,28 @@ namespace SignalRServer
                             Opponent = theOneThatMoves.Opponent.Name,
                             GameType = theOneThatMoves.GamePexeso.GameType,
                             GameStart = theOneThatMoves.GamePexeso.GameStart,
-                            GameFinish = new DateTime(),
+                            GameFinish = DateTime.Now,
                             GameResult = theOneThatMoves.GameResult,
-                            TotalMoves = theOneThatMoves.TotalMoves,
-                            TotalScore = theOneThatMoves.TotalScore
+                            TotalMoves = theOneThatMoves.TotalMoves
+                        };
+
+                        var p2 = new PlayerWrap()
+                        {
+                            ConnectionId = theOpponenet.ConnectionId,
+                            Points = theOpponenet.Points,
+                            Name = theOpponenet.Name,
+                            Opponent = theOpponenet.Opponent.Name,
+                            GameType = theOpponenet.GamePexeso.GameType,
+                            GameStart = theOpponenet.GamePexeso.GameStart,
+                            GameFinish = DateTime.Now,
+                            GameResult = theOpponenet.GameResult,
+                            TotalMoves = theOpponenet.TotalMoves
                         };
 
                         //call web api for persistance stuff
                         await _apiClient.CreateProductAsync(pl);
+                        await _apiClient.CreateProductAsync(p2);
+
 
 
                         //clean up
@@ -319,16 +332,22 @@ namespace SignalRServer
                 x.Player1.ConnectionId == Context.ConnectionId || x.Player2.ConnectionId == Context.ConnectionId);
             var theOneThatDisconnects = Players.Find(n => n.ConnectionId == Context.ConnectionId);
 
-            var theOpponenet = theOneThatDisconnects.Opponent;
-
-            theOneThatDisconnects.Reinitialize();
-            theOpponenet.Reinitialize();
 
             Games.RemoveAll(n =>
                 n.Player1.ConnectionId == theOneThatDisconnects.ConnectionId ||
                 n.Player2.ConnectionId == theOneThatDisconnects.ConnectionId);
 
-            Clients.Client(theOpponenet.ConnectionId).opponentDisconnected(theOneThatDisconnects.Name);
+            var theOpponenet = theOneThatDisconnects.Opponent;
+
+            if (theOpponenet != null)
+            {
+                theOpponenet.Reinitialize();
+                Clients.Client(theOpponenet.ConnectionId).opponentDisconnected(theOneThatDisconnects.Name);
+            }
+            theOneThatDisconnects.Reinitialize();
+            
+          
+        
         }
 
 

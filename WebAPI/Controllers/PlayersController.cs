@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using WebAPI.Enums;
 using WebAPI.Models;
+using WebAPI.Repositories;
 
 namespace WebAPI.Controllers
 {
@@ -12,6 +14,15 @@ namespace WebAPI.Controllers
     [ApiController]
     public class PlayersController : ControllerBase
     {
+
+        private readonly IPlayerRepository _playerRepository;
+
+        public PlayersController(IPlayerRepository playerRepository)
+        {
+            _playerRepository = playerRepository;
+        }
+
+
         // GET: api/Players
         [HttpGet]
         public IEnumerable<string> Get()
@@ -30,13 +41,27 @@ namespace WebAPI.Controllers
         //[HttpPost]
         //public void Post([FromBody] string value)
         //{
-        //    Console.WriteLine(value);
+
+        //    var pl = new PlayerWrap()
+        //    {
+        //        Name = "12",
+        //        Opponent = "2",
+        //        GameResult = GameResult.DRAW,
+        //        TotalMoves = 2,
+        //        ConnectionId = "2114124",
+        //        TotalScore = 1254,
+        //        GameFinish = new DateTime(),
+        //        GameStart = new DateTime(),
+        //        GameType = GameTypes.OsemXOsem,
+        //        Points = 2
+        //    };
+        //    _playerRepository.CreatePlayer(pl);
         //}
 
-        [HttpPost]
-        public void Post( [FromBody] PlayerWrap value)
-        { 
-            Console.WriteLine(value);
+        //[HttpPost]
+        public void Post([FromBody] PlayerWrap value)
+        {
+            _playerRepository.CreatePlayer(value);
         }
 
         // PUT: api/Players/5
@@ -52,9 +77,5 @@ namespace WebAPI.Controllers
         }
     }
 
-    public class Test
-    { 
-    private string J;
-    private int V;
-    }
+
 }

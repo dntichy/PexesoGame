@@ -12,7 +12,6 @@ namespace SignalRServer.Entities
         //statistics
         public int Points { get; set; }
         public int TotalMoves { get; set; }
-        public int TotalScore { get; set; }
         public GameResult? GameResult { get; set; }
         public GameTypes? GameType { get; set; }
         public DateTime GameStart { get; set; }
